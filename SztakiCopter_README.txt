@@ -1,0 +1,1 @@
+This branch is used to generate custom code for the ArduCopter 3.6.8 firmware.
