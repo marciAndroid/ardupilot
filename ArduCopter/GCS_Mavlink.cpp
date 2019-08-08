@@ -1201,8 +1201,8 @@ void GCS_MAVLINK_Copter::handleMessage(mavlink_message_t* msg)
             break;
         }
 
-        // ensure type_mask specifies to use attitude and thrust
-        if ((packet.type_mask & ((1<<7)|(1<<6))) != 0) {
+        // ensure type_mask specifies to use (old: attitude and thrust) body rates and thrust
+        if ((packet.type_mask & ((1 << 7) | (1 << 6) | (1 << 5) | (1 << 1))) != 0) {
             break;
         }
 
