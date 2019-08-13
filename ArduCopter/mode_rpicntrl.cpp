@@ -18,9 +18,9 @@ struct {
 bool Copter::ModeRpiCntrl::init(bool ignore_checks)
 {
     // if motors are not armed, cannot enter this mode
-    if (!motors->armed()) {
+    /*if (!motors->armed()) {
         return false;
-    }
+    }*/
 
     return true;
 }
@@ -177,7 +177,7 @@ void Copter::ModeRpiCntrl::get_pilot_desired_angle_rates(int16_t roll_in, int16_
 void Copter::ModeRpiCntrl::set_target(float roll_rate_rads, float pitch_rate_rads, float yaw_rate_rads, float climb_rate_cms)
 {
     // convert quaternion to euler angles
-    q.to_euler(rpicntrl_commanded_angle_rates.roll_cd, rpicntrl_commanded_angle_rates.pitch_cd, rpicntrl_commanded_angle_rates.yaw_cd);
+    //q.to_euler(rpicntrl_commanded_angle_rates.roll_cd, rpicntrl_commanded_angle_rates.pitch_cd, rpicntrl_commanded_angle_rates.yaw_cd);
     rpicntrl_commanded_angle_rates.roll_cd = ToDeg(rpicntrl_commanded_angle_rates.roll_cd) * 100.0f;
     rpicntrl_commanded_angle_rates.pitch_cd = ToDeg(rpicntrl_commanded_angle_rates.pitch_cd) * 100.0f;
     rpicntrl_commanded_angle_rates.yaw_cd = wrap_180_cd(ToDeg(rpicntrl_commanded_angle_rates.yaw_cd) * 100.0f);
