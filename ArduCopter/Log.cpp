@@ -473,7 +473,7 @@ struct PACKED log_GuidedTarget {
 void Copter::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target)
 {
     struct log_GuidedTarget pkt = {
-        LOG_PACKET_HEADER_INIT(LOG_GUIDEDTARGET_MSG),_
+        LOG_PACKET_HEADER_INIT(LOG_GUIDEDTARGET_MSG),
         time_us         : AP_HAL::micros64(),
         type            : target_type,
         pos_target_x    : pos_target.x,

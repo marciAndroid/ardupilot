@@ -187,32 +187,6 @@ protected:
     // end pass-through functions
 };
 
-class ModeRpiCntrl : public Mode {
-
-public:
-    // inherit constructor
-    using Copter::Mode::Mode;
-
-    virtual bool init(bool ignore_checks) override;
-    virtual void run() override;
-
-    bool is_autopilot() const override { return true; }
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return true; }
-    bool allows_arming(bool from_gcs) const override { return false; };
-    void set_target(float roll_rate_rads, float pitch_rate_rads, float yaw_rate_rads, float climb_rate_cms);
-
-protected:
-
-    const char *name() const override { return "RPICNTRL"; }
-    const char *name4() const override { return "RPIC"; }
-
-    void get_pilot_desired_angle_rates(int16_t roll_in, int16_t pitch_in, int16_t yaw_in, float &roll_out, float &pitch_out, float &yaw_out);
-
-private:
-
-};
-
 
 #if MODE_ACRO_ENABLED == ENABLED
 class ModeAcro : public Mode {
