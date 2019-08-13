@@ -76,6 +76,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Marci\Desktop\quad_stuff\ardupilot\ardupilot\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -159,6 +160,7 @@
     <ClCompile Include="ArduCopter\mode_land.cpp" />
     <ClCompile Include="ArduCopter\mode_loiter.cpp" />
     <ClCompile Include="ArduCopter\mode_poshold.cpp" />
+    <ClCompile Include="ArduCopter\mode_rpicntrl.cpp" />
     <ClCompile Include="ArduCopter\mode_rtl.cpp" />
     <ClCompile Include="ArduCopter\mode_smart_rtl.cpp" />
     <ClCompile Include="ArduCopter\mode_sport.cpp" />

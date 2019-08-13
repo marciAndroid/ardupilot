@@ -953,6 +953,7 @@ private:
     ModeAcro mode_acro;
 #endif
 #endif
+    ModeRpiCntrl mode_rpicntrl;
     ModeAltHold mode_althold;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
