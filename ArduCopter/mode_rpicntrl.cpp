@@ -8,7 +8,6 @@
 
 /* <r/p/y>_cd 's are angle rates */
 struct {
-    uint32_t update_time_ms;
     float roll_cd;
     float pitch_cd;
     float yaw_cd;
@@ -174,7 +173,7 @@ void Copter::ModeRpiCntrl::get_pilot_desired_angle_rates(int16_t roll_in, int16_
 }
 
 // set guided mode angle target
-void Copter::ModeRpiCntrl::set_target(float roll_rate_rads, float pitch_rate_rads, float yaw_rate_rads, float climb_rate_cms)
+void Copter::ModeRpiCntrl::set_target(const float roll_rate_rads, const float pitch_rate_rads, const float yaw_rate_rads, const float climb_rate_cms)
 {
     // convert quaternion to euler angles
     //q.to_euler(rpicntrl_commanded_angle_rates.roll_cd, rpicntrl_commanded_angle_rates.pitch_cd, rpicntrl_commanded_angle_rates.yaw_cd);
@@ -183,7 +182,6 @@ void Copter::ModeRpiCntrl::set_target(float roll_rate_rads, float pitch_rate_rad
     rpicntrl_commanded_angle_rates.yaw_cd = wrap_180_cd(ToDeg(rpicntrl_commanded_angle_rates.yaw_cd) * 100.0f);
 
     rpicntrl_commanded_angle_rates.climb_rate_cms = climb_rate_cms;
-    rpicntrl_commanded_angle_rates.update_time_ms = millis();
 
     // interpret positive climb rate as triggering take-off
     if (motors->armed() && !ap.auto_armed && (rpicntrl_commanded_angle_rates.climb_rate_cms > 0.0f)) {
