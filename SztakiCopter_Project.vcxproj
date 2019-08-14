@@ -159,6 +159,7 @@
     <ClCompile Include="ArduCopter\mode_land.cpp" />
     <ClCompile Include="ArduCopter\mode_loiter.cpp" />
     <ClCompile Include="ArduCopter\mode_poshold.cpp" />
+    <ClCompile Include="ArduCopter\mode_rpicntrl.cpp" />
     <ClCompile Include="ArduCopter\mode_rtl.cpp" />
     <ClCompile Include="ArduCopter\mode_smart_rtl.cpp" />
     <ClCompile Include="ArduCopter\mode_sport.cpp" />

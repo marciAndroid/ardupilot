@@ -207,6 +207,9 @@
     <ClCompile Include="ArduCopter\version.cpp">
       <Filter>ArduCopter</Filter>
     </ClCompile>
+    <ClCompile Include="ArduCopter\mode_rpicntrl.cpp">
+      <Filter>ArduCopter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArduCopter\afs_copter.h">

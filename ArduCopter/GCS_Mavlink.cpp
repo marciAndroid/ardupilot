@@ -1201,8 +1201,14 @@ void GCS_MAVLINK_Copter::handleMessage(mavlink_message_t* msg)
             break;
         }
 
-        // ensure type_mask specifies to use (old: attitude and thrust) body rates and thrust
+        /*
+        // ensure type_mask specifies to use body rates and thrust
         if ((packet.type_mask & ((1 << 7) | (1 << 6) | (1 << 5) | (1 << 1))) != 0) {
+            break;
+        }
+        */
+        // ensure type_mask specifies to use attitude and thrust
+        if ((packet.type_mask & ((1 << 7) | (1 << 6))) != 0) {
             break;
         }
 
@@ -1227,6 +1233,8 @@ void GCS_MAVLINK_Copter::handleMessage(mavlink_message_t* msg)
         }
 
         copter.mode_guided.set_angle(Quaternion(packet.q[0],packet.q[1],packet.q[2],packet.q[3]),
+            climb_rate_cms, use_yaw_rate, packet.body_yaw_rate);
+        copter.mode_guided_nogps.set_target_attitude(Quaternion(packet.q[0], packet.q[1], packet.q[2], packet.q[3]),
             climb_rate_cms, use_yaw_rate, packet.body_yaw_rate);
 
         break;
