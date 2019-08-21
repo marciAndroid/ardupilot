@@ -1235,7 +1235,7 @@ void GCS_MAVLINK_Copter::handleMessage(mavlink_message_t* msg)
         copter.mode_guided.set_angle(Quaternion(packet.q[0],packet.q[1],packet.q[2],packet.q[3]),
             climb_rate_cms, use_yaw_rate, packet.body_yaw_rate);
         copter.mode_guided_nogps.set_target_attitude(Quaternion(packet.q[0], packet.q[1], packet.q[2], packet.q[3]),
-            climb_rate_cms, use_yaw_rate, packet.body_yaw_rate);
+            climb_rate_cms);
 
         break;
     }
