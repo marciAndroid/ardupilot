@@ -877,7 +877,7 @@ public:
     bool allows_arming(bool from_gcs) const override { return from_gcs; }
     bool is_autopilot() const override { return true; }
 
-    void set_target_attitude(const Quaternion &q, float climb_rate_cms);
+    void set_target_attitude(const Quaternion &q, float throttle_in);
 
 protected:
 

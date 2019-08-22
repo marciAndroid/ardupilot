@@ -10,7 +10,7 @@ struct {
     float roll_cd;
     float pitch_cd;
     float yaw_cd;
-    float climb_rate_cms;
+    float throttle_in;
 } static guided_nogps_angle_state;
 
 // initialise guided mode's angle controller
@@ -24,14 +24,14 @@ void Copter::ModeGuidedNoGPS::angle_control_start()
     guided_nogps_angle_state.roll_cd = ahrs.roll_sensor;
     guided_nogps_angle_state.pitch_cd = ahrs.pitch_sensor;
     guided_nogps_angle_state.yaw_cd = ahrs.yaw_sensor;
-    guided_nogps_angle_state.climb_rate_cms = 0.0f;
+    guided_nogps_angle_state.throttle_in = 0.0f;
 
     // pilot always controls yaw
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 }
 
  // set guided mode angle target
-void Copter::ModeGuidedNoGPS::set_target_attitude(const Quaternion &q, float climb_rate_cms)
+void Copter::ModeGuidedNoGPS::set_target_attitude(const Quaternion &q, float throttle_in)
 {
     // check we are in velocity control mode
     if (guided_nogps_mode != Guided_NoGPS_Angle) {
@@ -44,11 +44,11 @@ void Copter::ModeGuidedNoGPS::set_target_attitude(const Quaternion &q, float cli
     guided_nogps_angle_state.pitch_cd = ToDeg(guided_nogps_angle_state.pitch_cd) * 100.0f;
     guided_nogps_angle_state.yaw_cd = wrap_180_cd(ToDeg(guided_nogps_angle_state.yaw_cd) * 100.0f);
 
-    guided_nogps_angle_state.climb_rate_cms = climb_rate_cms;
+    guided_nogps_angle_state.throttle_in = throttle_in;
     guided_nogps_angle_state.update_time_ms = millis();
 
     // interpret positive climb rate as triggering take-off
-    if (motors->armed() && !ap.auto_armed && (guided_nogps_angle_state.climb_rate_cms > 0.0f)) {
+    if (motors->armed() && !ap.auto_armed && (guided_nogps_angle_state.throttle_in > 0.0f)) {
         copter.set_auto_armed(true);
     }
 
@@ -78,7 +78,7 @@ void Copter::ModeGuidedNoGPS::run()
 void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
 {
     // if not auto armed or motors not enabled set throttle to zero and exit immediately
-    if (!motors->armed() || !ap.auto_armed || !motors->get_interlock() || (ap.land_complete && guided_nogps_angle_state.climb_rate_cms <= 0.0f)) {
+    if (!motors->armed() || !ap.auto_armed || !motors->get_interlock() || (ap.land_complete && guided_nogps_angle_state.throttle_in <= 0.0f)) {
         zero_throttle_and_relax_ac();
         //pos_control->relax_alt_hold_controllers(0.0f);
         return;
@@ -99,7 +99,7 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     float yaw_in = wrap_180_cd(guided_nogps_angle_state.yaw_cd);
 
     // constrain climb rate
-    float climb_rate_cms = constrain_float(guided_nogps_angle_state.climb_rate_cms, -fabsf(wp_nav->get_speed_down()), wp_nav->get_speed_up());
+    float climb_rate_cms = constrain_float(guided_nogps_angle_state.throttle_in, -fabsf(wp_nav->get_speed_down()), wp_nav->get_speed_up());
 
     // get avoidance adjusted climb rate
     climb_rate_cms = get_avoidance_adjusted_climbrate(climb_rate_cms);
@@ -117,6 +117,9 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
 
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
+    
+    // output pilot's throttle
+    attitude_control->set_throttle_out(guided_nogps_angle_state.throttle_in, true, g.throttle_filt);
 
     // call position controller
     //pos_control->set_alt_target_from_climb_rate_ff(climb_rate_cms, G_Dt, false);
