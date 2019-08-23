@@ -103,6 +103,7 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
 
     // Scale up 0..1 to 1000..2000
     float pilot_throttle_scaled = get_pilot_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0 + 1000.0);
+    pilot_throttle_scaled = get_pilot_desired_throttle(channel_throttle->get_control_in());
 
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
