@@ -102,8 +102,7 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     motors->set_desired_spool_state(AP_Motors::DESIRED_THROTTLE_UNLIMITED);
 
     // Scale up 0..1 to 1000..2000
-    float pilot_throttle_scaled = get_pilot_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0 + 1000.0);
-    pilot_throttle_scaled = get_pilot_desired_throttle(channel_throttle->get_control_in());
+    float pilot_throttle_scaled = get_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0 + 1000.0);
 
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
@@ -114,4 +113,34 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     // call position controller
     //pos_control->set_alt_target_from_climb_rate_ff(climb_rate_cms, G_Dt, false);
     //pos_control->update_z_controller();
+}
+
+float Copter::ModeGuidedNoGPS::get_desired_throttle(int16_t throttle_control)
+{
+    float thr_mid = 0.35f;
+
+    int16_t mid_stick = 500;
+
+    // ensure reasonable throttle values
+    throttle_control = constrain_int16(throttle_control, 0, 1000);
+
+    // calculate normalised throttle input
+    float throttle_in;
+    if (throttle_control < mid_stick) {
+        // below the deadband
+        throttle_in = ((float)throttle_control)*0.5f / (float)mid_stick;
+    }
+    else if (throttle_control > mid_stick) {
+        // above the deadband
+        throttle_in = 0.5f + ((float)(throttle_control - mid_stick)) * 0.5f / (float)(1000 - mid_stick);
+    }
+    else {
+        // must be in the deadband
+        throttle_in = 0.5f;
+    }
+
+    float expo = constrain_float(-(thr_mid - 0.5) / 0.375, -0.5f, 1.0f);
+    // calculate the output throttle using the given expo function
+    float throttle_out = throttle_in * (1.0f - expo) + expo * throttle_in*throttle_in*throttle_in;
+    return throttle_out;
 }
