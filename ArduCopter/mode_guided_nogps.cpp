@@ -102,7 +102,7 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     motors->set_desired_spool_state(AP_Motors::DESIRED_THROTTLE_UNLIMITED);
 
     // Scale up 0..1 to 1000..2000
-    float pilot_throttle_scaled = get_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0 + 1000.0);
+    float pilot_throttle_scaled = get_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0);
 
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
@@ -117,7 +117,7 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
 
 float Copter::ModeGuidedNoGPS::get_desired_throttle(int16_t throttle_control)
 {
-    float thr_mid = 0.35f;
+    float thr_mid = 0.4f;
 
     int16_t mid_stick = 500;
 
