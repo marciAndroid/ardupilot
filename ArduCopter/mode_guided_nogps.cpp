@@ -19,6 +19,16 @@ void Copter::ModeGuidedNoGPS::angle_control_start()
     // set guided_mode to velocity controller
     guided_nogps_mode = Guided_NoGPS_Angle;
 
+    // set vertical speed and acceleration
+    pos_control->set_speed_z(wp_nav->get_speed_down(), wp_nav->get_speed_up());
+    pos_control->set_accel_z(wp_nav->get_accel_z());
+
+    // initialise position and desired velocity
+    if (!pos_control->is_active_z()) {
+        pos_control->set_alt_target_to_current_alt();
+        pos_control->set_desired_velocity_z(inertial_nav.get_velocity_z());
+    }
+
     // initialise targets
     guided_nogps_angle_state.update_time_ms = millis();
     guided_nogps_angle_state.roll_cd = ahrs.roll_sensor;
@@ -70,7 +80,7 @@ void Copter::ModeGuidedNoGPS::run()
     if (guided_nogps_mode == Guided_NoGPS_Angle) {
         Copter::ModeGuidedNoGPS::angle_control_run_nogps();
     }
-    
+
 }
 
 // guided_angle_control_run - runs the guided angle controller
@@ -102,17 +112,14 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     motors->set_desired_spool_state(AP_Motors::DESIRED_THROTTLE_UNLIMITED);
 
     // Scale up 0..1 to 1000..2000
-    float pilot_throttle_scaled = get_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0);
+    //float pilot_throttle_scaled = guided_nogps_angle_state.throttle_in;//get_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0);
 
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
-    
-    // output pilot's throttle
-    attitude_control->set_throttle_out(pilot_throttle_scaled, true, g.throttle_filt);
 
     // call position controller
-    //pos_control->set_alt_target_from_climb_rate_ff(climb_rate_cms, G_Dt, false);
-    //pos_control->update_z_controller();
+    pos_control->set_alt_target_from_climb_rate_ff(0.0, G_Dt, false);
+    pos_control->update_z_controller();
 }
 
 float Copter::ModeGuidedNoGPS::get_desired_throttle(int16_t throttle_control)
