@@ -98,28 +98,17 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     // wrap yaw request
     float yaw_in = wrap_180_cd(guided_nogps_angle_state.yaw_cd);
 
-    // constrain climb rate
-    float climb_rate_cms = constrain_float(guided_nogps_angle_state.throttle_in, -fabsf(wp_nav->get_speed_down()), wp_nav->get_speed_up());
-
-    // get avoidance adjusted climb rate
-    climb_rate_cms = get_avoidance_adjusted_climbrate(climb_rate_cms);
-
-    // check for timeout - set lean angles and climb rate to zero if no updates received for 3 seconds
-    uint32_t tnow = millis();
-    if (tnow - guided_nogps_angle_state.update_time_ms > GUIDED_ATTITUDE_TIMEOUT_MS) {
-        roll_in = 0.0f;
-        pitch_in = 0.0f;
-        climb_rate_cms = 0.0f;
-    }
-
     // set motors to full range
     motors->set_desired_spool_state(AP_Motors::DESIRED_THROTTLE_UNLIMITED);
+
+    // Scale up 0..1 to 1000..2000
+    float pilot_throttle_scaled = get_pilot_desired_throttle(guided_nogps_angle_state.throttle_in * 1000.0 + 1000.0);
 
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
     
     // output pilot's throttle
-    attitude_control->set_throttle_out(guided_nogps_angle_state.throttle_in, true, g.throttle_filt);
+    attitude_control->set_throttle_out(pilot_throttle_scaled, true, g.throttle_filt);
 
     // call position controller
     //pos_control->set_alt_target_from_climb_rate_ff(climb_rate_cms, G_Dt, false);
