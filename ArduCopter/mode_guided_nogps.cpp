@@ -111,17 +111,23 @@ void Copter::ModeGuidedNoGPS::angle_control_run_nogps()
     // set motors to full range
     motors->set_desired_spool_state(AP_Motors::DESIRED_THROTTLE_UNLIMITED);
 
+    float target_roll, target_pitch;
+    get_pilot_desired_lean_angles(target_roll, target_pitch, copter.aparm.angle_max, copter.aparm.angle_max);
+
+    yaw_in = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
+
     // Throttle input
     float pilot_throttle_scaled = get_pilot_desired_throttle(channel_throttle->get_control_in());
 	//get_desired_throttle(channel_throttle->get_control_in());
 
     // call attitude controller
-    attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
+    //attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
+    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, yaw_in);
 
     // output pilot's throttle
     attitude_control->set_throttle_out(pilot_throttle_scaled, true, g.throttle_filt);
 
-    // call position controller
+    //call position controller
     //pos_control->set_alt_target_from_climb_rate_ff(0.0, G_Dt, false);
     //pos_control->update_z_controller();
 }
