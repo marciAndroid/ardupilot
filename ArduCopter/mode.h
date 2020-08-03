@@ -853,10 +853,17 @@ public:
     bool allows_arming(bool from_gcs) const override { return from_gcs; }
     bool is_autopilot() const override { return true; }
 
+    void set_target_attitude(const Quaternion & q, float throttle_in);
+
 protected:
 
     const char *name() const override { return "GUIDED_NOGPS"; }
     const char *name4() const override { return "GNGP"; }
+
+    void angle_control_run_nogps();
+    void angle_control_start();
+
+    GuidedNoGpsMode guided_nogps_mode = Guided_NoGPS_Angle;
 
 private:
 

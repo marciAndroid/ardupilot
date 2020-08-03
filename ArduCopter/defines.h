@@ -107,6 +107,12 @@ enum GuidedMode {
     Guided_Angle,
 };
 
+// Guided NoGPS modes
+enum GuidedNoGpsMode {
+    Guided_NoGPS_TakeOff,
+    Guided_NoGPS_Angle,
+};
+
 // Airmode
 enum class AirMode {
     AIRMODE_NONE,
