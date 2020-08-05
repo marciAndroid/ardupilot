@@ -12,6 +12,7 @@ public:
 
     // Auto Pilot Modes enumeration
     enum class Number : uint8_t {
+
         STABILIZE =     0,  // manual airframe angle with manual throttle
         ACRO =          1,  // manual body-frame angular rate with manual throttle
         ALT_HOLD =      2,  // manual airframe angle with automatic throttle
@@ -852,6 +853,7 @@ public:
     bool has_manual_throttle() const override { return false; }
     bool allows_arming(bool from_gcs) const override { return from_gcs; }
     bool is_autopilot() const override { return true; }
+    bool in_guided_mode() const override { return true; }
 
     void set_target_attitude(const Quaternion & q, float throttle_in);
 
@@ -863,7 +865,7 @@ protected:
     void angle_control_run_nogps();
     void angle_control_start();
 
-    GuidedNoGpsMode guided_nogps_mode = Guided_NoGPS_Angle;
+    GuidedNoGpsMode guided_nogps_mode = Guided_NoGPS_Start;
 
 private:
 

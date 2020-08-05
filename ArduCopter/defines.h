@@ -109,6 +109,7 @@ enum GuidedMode {
 
 // Guided NoGPS modes
 enum GuidedNoGpsMode {
+    Guided_NoGPS_Start,
     Guided_NoGPS_TakeOff,
     Guided_NoGPS_Angle,
 };

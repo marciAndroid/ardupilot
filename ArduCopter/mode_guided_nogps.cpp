@@ -5,7 +5,7 @@
 /*
  * Init and run calls for guided_nogps flight mode
  */
-#define GUIDED_ATTITUDE_TIMEOUT_MS  1500    // guided mode's attitude controller times out after 1 second with no new updates
+#define GUIDED_NOGPS_ATTITUDE_TIMEOUT_MS  1500    // guided mode's attitude controller times out after 1 second with no new updates
 
 struct {
     uint32_t update_time_ms;
@@ -18,7 +18,7 @@ struct {
 // initialise guided mode's angle controller
 void ModeGuidedNoGPS::angle_control_start() {
 
-    // set guided_mode to velocity controller
+    // set guided_mode to attitude controller
     guided_nogps_mode = Guided_NoGPS_Angle;
 
     // set vertical speed and acceleration
@@ -26,10 +26,10 @@ void ModeGuidedNoGPS::angle_control_start() {
     copter.pos_control->set_max_accel_z(wp_nav->get_accel_z());
 
     // initialise position and desired velocity
-    if (!pos_control->is_active_z()) {
+    /* if (!pos_control->is_active_z()) {
         pos_control->set_alt_target_to_current_alt();
         pos_control->set_desired_velocity_z(inertial_nav.get_velocity_z());
-    }
+     }*/
 
     // initialise targets
     guided_nogps_angle_state.update_time_ms = millis();
@@ -46,9 +46,11 @@ void ModeGuidedNoGPS::angle_control_start() {
 void ModeGuidedNoGPS::set_target_attitude(const Quaternion & q, float throttle_in) {
     
     // check we are in velocity control mode
+/*
     if (guided_nogps_mode != Guided_NoGPS_Angle) {
         angle_control_start();
     }
+*/
 
     // convert quaternion to euler angles
     q.to_euler(guided_nogps_angle_state.roll_cd, guided_nogps_angle_state.pitch_cd, guided_nogps_angle_state.yaw_cd);
@@ -68,6 +70,9 @@ void ModeGuidedNoGPS::set_target_attitude(const Quaternion & q, float throttle_i
 
 // initialise guided_nogps controller
 bool ModeGuidedNoGPS::init(bool ignore_checks) {
+
+    angle_control_start();
+
     if (!motors->armed()) {
         return false;
     }
@@ -96,6 +101,7 @@ void ModeGuidedNoGPS::angle_control_run_nogps() {
     // constrain desired lean angles
     float roll_in = guided_nogps_angle_state.roll_cd;
     float pitch_in = guided_nogps_angle_state.pitch_cd;
+
     float total_in = norm(roll_in, pitch_in);
     float angle_max = MIN(attitude_control->get_althold_lean_angle_max(), copter.aparm.angle_max);
     if (total_in > angle_max) {
@@ -113,7 +119,7 @@ void ModeGuidedNoGPS::angle_control_run_nogps() {
     float target_roll, target_pitch;
     get_pilot_desired_lean_angles(target_roll, target_pitch, copter.aparm.angle_max, copter.aparm.angle_max);
 
-    yaw_in = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
+    //yaw_in = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
 
     // Throttle input 0..1
     float pilot_throttle_scaled = get_pilot_desired_throttle();
@@ -121,7 +127,7 @@ void ModeGuidedNoGPS::angle_control_run_nogps() {
 
     // check for timeout - set lean angles and climb rate to zero if no updates received for 3 seconds
     uint32_t tnow = millis();
-    if (tnow - guided_nogps_angle_state.update_time_ms > GUIDED_ATTITUDE_TIMEOUT_MS) {
+    if (tnow - guided_nogps_angle_state.update_time_ms > GUIDED_NOGPS_ATTITUDE_TIMEOUT_MS) {
         target_roll = 0.0f;
         target_pitch = 0.0f;
         yaw_in = 0.0f;
@@ -129,11 +135,11 @@ void ModeGuidedNoGPS::angle_control_run_nogps() {
     }
 
     // call attitude controller
-    //attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
-    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, yaw_in);
+    attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
+    //attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, yaw_in);
 
     // output pilot's throttle
-    attitude_control->set_throttle_out(pilot_throttle_scaled, true, g.throttle_filt);
+    attitude_control->set_throttle_out(pilot_throttle_scaled, false, g.throttle_filt);
 
 }
 

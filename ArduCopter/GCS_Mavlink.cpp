@@ -990,10 +990,10 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
         }
 
         // ensure type_mask specifies to use attitude and thrust
-        if ((packet.type_mask & ((1<<7)|(1<<6))) != 0) {
+/*         if ((packet.type_mask & ((1<<7)|(1<<6) | (1 << 5) | (1 << 1))) != 0) {
             break;
         }
-
+ */
         // convert thrust to climb rate
         packet.thrust = constrain_float(packet.thrust, 0.0f, 1.0f);
         float climb_rate_cms = 0.0f;
